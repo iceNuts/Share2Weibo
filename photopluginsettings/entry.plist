@@ -1,0 +1,10 @@
+{
+    entry = {
+	bundle = photopluginsettings;
+	cell = PSLinkCell;
+	detail = photopluginsettingsListController;
+	icon = Icon-Small.png;
+	isController = 1;
+	label = Share2Weibo;
+    };
+}

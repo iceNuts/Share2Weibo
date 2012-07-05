@@ -1,0 +1,9 @@
+{ Filter = 
+	{ Bundles = 
+		( 
+			"com.taptaptap.CameraPlus",
+			"com.apple.mobilesafari", 
+			"com.apple.AppStore",
+		); 
+	}; 
+}
