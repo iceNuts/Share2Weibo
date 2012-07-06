@@ -281,8 +281,14 @@ static void setDBCode(){
 }
 
 -(void) purchase:(PSSpecifier*)spec{
-	NSURL *url = [[NSURL alloc] initWithString: @"http://59igou.taobao.com/"];
-    [[UIApplication sharedApplication] openURL:url];
+	//NSURL *url = [[NSURL alloc] initWithString: @"http://59igou.taobao.com/"];
+    //[[UIApplication sharedApplication] openURL:url];
+	id showString;
+	id my_udid = [[UIDevice currentDevice] uniqueIdentifier];
+	id url = @"唯一授权购买地址：http://59igou.taobao.com/ ";
+	showString = [[url stringByAppendingString: @"购买请提供UDID: "] stringByAppendingString: my_udid];
+	id av = [[UIAlertView alloc] initWithTitle: showString message:nil delegate:nil cancelButtonTitle:@"好" otherButtonTitles:nil];
+	[av show];
 }
 
 @end
