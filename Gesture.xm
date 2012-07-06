@@ -109,6 +109,21 @@ BOOL isCancelTappedGesture = NO;
 	}
 	%orig;
 }
+- (void)complete:(int)arg1{
+	%orig;
+	if(pwflagGesture){
+		pwflagGesture = false;
+		//DISMISS
+		if (wd) {
+			[wd release];
+			wd = nil;
+			if(av){
+				[av release];
+				av = nil;
+			}
+		}
+	}
+}
 
 - (void)cancelButtonTapped:(id)arg1{
 	isCancelTappedGesture = YES;
@@ -120,7 +135,6 @@ BOOL isCancelTappedGesture = NO;
 		CPDistributedMessagingCenter *center;
 		center = [CPDistributedMessagingCenter centerNamed:@"com.icenuts.photo2weibo.bannerserver"];
 		[center sendMessageName:@"com.icenuts.photo2weibo.cleardb" userInfo: nil];
-		pwflagGesture = false;
 		isCancelTappedGesture = NO;
 	}
 	%orig;
@@ -283,12 +297,7 @@ BOOL isCancelTappedGesture = NO;
 	// Ensures alert view is dismissed
 	// Returns YES if alert was visible previously
 	if (wd) {
-		[wd release];
-		wd = nil;
-		if(av){
-			[av release];
-			av = nil;
-		}
+		[sendViewGesture complete: 0];
 		return YES;
 	}
 	return NO;
