@@ -94,7 +94,7 @@ BOOL isCancelTappedGesture = NO;
 		}
 		NSDictionary *dictionary;
 		if(isAddPicture){
-			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgData",UIImagePNGRepresentation([ppicker chose])];
+			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", UIImagePNGRepresentation([ppicker chose]), @"imgData", nil];
 		}else{
 			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgPath",nil ];
 		}
@@ -102,18 +102,7 @@ BOOL isCancelTappedGesture = NO;
 		center = [CPDistributedMessagingCenter centerNamed:@"com.icenuts.photo2weibo.bannerserver"];
 		[center sendMessageName:@"com.icenuts.share2weibo.send" userInfo: dictionary];
 		
-		pwflagGesture = false;
 		[self complete: 0];
-		
-		//DISMISS
-		if (wd) {
-			[wd release];
-			wd = nil;
-			if(av){
-				[av release];
-				av = nil;
-			}
-		}
 		
 	}else{
 		%orig;
