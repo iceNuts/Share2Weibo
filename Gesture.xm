@@ -93,8 +93,9 @@ BOOL isCancelTappedGesture = NO;
 			isAddPicture = [ppicker isAdded];
 		}
 		NSDictionary *dictionary;
+		NSData *my_data = UIImagePNGRepresentation([ppicker chose]);
 		if(isAddPicture){
-			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", UIImagePNGRepresentation([ppicker chose]), @"imgData", nil];
+			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", my_data, @"imgData", nil];
 		}else{
 			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgPath",nil ];
 		}
