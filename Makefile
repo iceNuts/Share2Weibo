@@ -2,7 +2,7 @@ GO_EASY_ON_ME=1
 include theos/makefiles/common.mk
 
 TWEAK_NAME = photopluginactivator
-photopluginactivator_FILES = Gesture.xm sqlService.m
+photopluginactivator_FILES = Gesture.xm sqlService.m photoPicker.mm
 photopluginactivator_FRAMEWORKS= Twitter UIKit Foundation
 photopluginactivator_PRIVATE_FRAMEWORKS= AppSupport
 SUBPROJECTS= photopluginsettings photosplugin 

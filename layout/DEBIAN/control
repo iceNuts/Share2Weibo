@@ -7,4 +7,3 @@ Description: An awesome MobileSubstrate tweak!
 Maintainer: _icenuts
 Author: _icenuts
 Section: Tweaks
-Depends: org.thebigboss.photo2weibo(>=2.4)

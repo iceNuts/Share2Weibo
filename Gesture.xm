@@ -6,11 +6,20 @@
 #import <tweet2weibo/TWTweetSheetLocationAssembly.h>
 #import <tweet2weibo/TWTweetComposeViewController-TWTweetComposeViewControllerMentionAdditions.h>
 #import <tweet2weibo/UIActionSheet-Private.h>
+#import "photoPicker.h"
 
 BOOL pwflagGesture = NO;
 UIWindow *wd;
 UIAlertView* av;
 id sendViewGesture;
+UIImagePickerController* imagePicker;
+photoPicker* ppicker;
+id picImageView;
+id picImageViewGlow;
+id assembly;
+BOOL isAddPicture = NO;
+id normal_image;
+id glow_image;
 
 //IPC Declaration
 @interface CPDistributedMessagingCenter
@@ -78,8 +87,17 @@ BOOL isCancelTappedGesture = NO;
 }
 - (void)send:(id)arg1{
 	if(pwflagGesture){
+		//judge isAddPicture
 		
-		NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgPath",nil ];
+		if(ppicker){
+			isAddPicture = [ppicker isAdded];
+		}
+		NSDictionary *dictionary;
+		if(isAddPicture){
+			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgData",UIImagePNGRepresentation([ppicker chose])];
+		}else{
+			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", nil, @"imgPath",nil ];
+		}
 		CPDistributedMessagingCenter *center;
 		center = [CPDistributedMessagingCenter centerNamed:@"com.icenuts.photo2weibo.bannerserver"];
 		[center sendMessageName:@"com.icenuts.share2weibo.send" userInfo: dictionary];
@@ -113,6 +131,7 @@ BOOL isCancelTappedGesture = NO;
 	%orig;
 	if(pwflagGesture){
 		pwflagGesture = false;
+		isAddPicture = NO;
 		//DISMISS
 		if (wd) {
 			[wd release];
@@ -121,6 +140,12 @@ BOOL isCancelTappedGesture = NO;
 				[av release];
 				av = nil;
 			}
+			sendViewGesture = nil;
+			imagePicker = nil;
+			ppicker = nil;
+			picImageView = nil;
+			picImageViewGlow = nil;
+			assembly = nil;
 		}
 	}
 }
@@ -165,10 +190,12 @@ BOOL isCancelTappedGesture = NO;
 			[label setText: @"新浪微博"];
 		}
 		var = class_getInstanceVariable([self class], "_locationAssembly");
-		id assembly = object_getIvar(self, var);
-		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_assemblyView");
-		id geo = object_getIvar(assembly, var);
-		[geo setHidden: YES];
+		assembly = object_getIvar(self, var);
+		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_locationButton");
+		picImageView = object_getIvar(assembly, var);
+		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_locationButtonGlow");
+		picImageViewGlow = object_getIvar(assembly, var);
+						
 		var = class_getInstanceVariable([self class], "_sendButton");
 		id sendButton = object_getIvar(self, var);
 		[sendButton setEnabled: YES];
@@ -279,6 +306,68 @@ BOOL isCancelTappedGesture = NO;
 }
 %end
 
+///////////////////////////////////////////
+//Modify Location button to Picture button
+//////////////////////////////////////////
+%hook TWTweetSheetLocationAssembly
+- (void)setLocationLabelText:(id)arg1{
+ 	if(pwflagGesture){
+		if(ppicker){
+			isAddPicture = [ppicker isAdded];
+		}
+		if(isAddPicture)
+			%orig(@"Remove Pic");
+		else
+			%orig(@"Add A Pic");
+	}else{
+		%orig(arg1);
+	}
+}
+- (void)locationButtonTapped:(id)arg1{
+	if(!pwflagGesture){
+		%orig(arg1);
+		return;
+	}
+	if(ppicker){
+		isAddPicture = [ppicker isAdded];
+	}
+	if(isAddPicture){
+		//Remove Pic
+		ppicker.isAdded = NO;
+		[sendViewGesture removeAllAttachmentsWithType: 0];
+		[assembly setLocationLabelText: nil];
+		[picImageView setImage: nil forState: UIControlStateNormal];
+	}else{
+		imagePicker = imagePicker? imagePicker : [[UIImagePickerController alloc] init];
+		if(!ppicker){
+			ppicker = [[photoPicker alloc] init];
+			imagePicker.delegate = ppicker;
+			ppicker.picImageView = picImageView;
+			ppicker.picStatusLabel = assembly;
+			ppicker.glow = glow_image;
+			[ppicker setParentViewController: sendViewGesture];
+			ppicker.isAdded = NO;
+		}
+		ppicker.text = [sendViewGesture enteredText];
+		imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+		[sendViewGesture presentViewController: imagePicker animated: YES completion: NULL];
+	}
+}
+%end
+
+%hook UIButton
+- (void)setImage:(id)arg1 forState:(unsigned int)arg2{
+	if([self isEqual: picImageView] && pwflagGesture){
+		if([ppicker isAdded] && ppicker)
+			%orig(glow_image, arg2);
+		else
+			%orig(normal_image, arg2);
+		return;
+	}
+	%orig(arg1, arg2);
+}
+%end
+
 //////////////////////////
 /////// Twitter UI////////
 //////////////////////////
@@ -321,12 +410,13 @@ BOOL isCancelTappedGesture = NO;
 			pwflagGesture = YES;
 			wd = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 			wd.screen = [UIScreen mainScreen];
-			[wd setWindowLevel: UIWindowLevelStatusBar];
+			[wd setWindowLevel: UIWindowLevelNormal];
 			Class $TWTweetComposeViewController = objc_getClass("TWTweetComposeViewController");
 			sendViewGesture = [[$TWTweetComposeViewController alloc] init];
 			[wd setRootViewController: [[UIViewController alloc] init]];
-			NSLog(@"----@@@@@-----");
 			[wd makeKeyAndVisible];			
+			normal_image = normal_image? normal_image : [[UIImage alloc] initWithContentsOfFile: @"var/mobile/Library/share2weibo/normal.png"];
+			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"var/mobile/Library/share2weibo/glow.png"];
 			[[wd rootViewController] presentViewController: sendViewGesture animated: NO completion: NULL];
 		}else{
 			pwflagGesture = NO;
