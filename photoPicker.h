@@ -1,3 +1,5 @@
+#import "Constants.h"
+
 @interface photoPicker: NSObject <UIImagePickerControllerDelegate>
 {
 }
@@ -14,4 +16,5 @@
 
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info;
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
 @end

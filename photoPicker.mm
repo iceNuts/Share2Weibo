@@ -45,5 +45,15 @@
 	[parentViewController _setText: text];
 }
 
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+	BOOL iPad = [[[UIDevice currentDevice] model] isEqualToString: @"iPad"];
+	if(iPad){
+		[self.popover dismissPopoverAnimated: YES];
+	}else{
+		[parentViewController dismissModalViewControllerAnimated: YES];
+	}
+	[parentViewController _setText: text];
+}
+
 @end
  

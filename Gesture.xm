@@ -141,10 +141,6 @@ BOOL isCancelTappedGesture = NO;
 			picImageView = nil;
 			picImageViewGlow = nil;
 			assembly = nil;
-			if(isHidden){
-				isHidden = NO;
-				[[UIApplication sharedApplication] setStatusBarHidden:NO  withAnimation:UIStatusBarAnimationSlide];
-			}
 		}
 	}
 }
@@ -303,6 +299,9 @@ BOOL isCancelTappedGesture = NO;
 	}
 	return %orig;
 }
+- (BOOL)shouldAutorotateToInterfaceOrientation:(int)arg1{
+	return %orig;
+}
 %end
 
 ///////////////////////////////////////////
@@ -346,20 +345,10 @@ BOOL isCancelTappedGesture = NO;
 			ppicker.glow = glow_image;
 			[ppicker setParentViewController: sendViewGesture];
 			ppicker.isAdded = NO;
-			imagePicker.allowsEditing = YES;
 		}
 		ppicker.text = [sendViewGesture enteredText];
 		imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-		
-		//can't fix statusbar hidden error, too hard
-		NSString* filePath = @"/var/mobile/Library/DisableNCSwitch/disableNC.plist";
-		NSMutableDictionary *plistDict = [[NSMutableDictionary alloc] initWithContentsOfFile: filePath];
-		if([[plistDict objectForKey:@"inApp"] isEqualToString: @"YES"]){
-			isHidden = YES;
-			[[UIApplication sharedApplication] setStatusBarHidden:YES  withAnimation:UIStatusBarAnimationSlide];
-		}else{
-			isHidden = NO;
-		}
+
 		BOOL iPad = [[[UIDevice currentDevice] model] isEqualToString: @"iPad"];
 		if(iPad){
 			id popover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
@@ -434,9 +423,15 @@ BOOL isCancelTappedGesture = NO;
 			Class $TWTweetComposeViewController = objc_getClass("TWTweetComposeViewController");
 			sendViewGesture = [[$TWTweetComposeViewController alloc] init];
 			[wd setRootViewController: [[UIViewController alloc] init]];
+			//For rotation
+			[wd _updateInterfaceOrientationFromDeviceOrientationIfRotationEnabled: YES];
+			[wd setAutorotates:YES forceUpdateInterfaceOrientation:YES];
+		
 			[wd makeKeyAndVisible];			
 			normal_image = normal_image? normal_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/normal.png"];
-			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/glow.png"];
+			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/glow.png"];	
+			[sendViewGesture _updateLayoutForStatusBarAndInterfaceOrientation];	
+			
 			[[wd rootViewController] presentViewController: sendViewGesture animated: NO completion: NULL];
 		}else{
 			pwflagGesture = NO;

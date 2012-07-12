@@ -7,4 +7,4 @@ Description: An awesome MobileSubstrate tweak!
 Maintainer: _icenuts
 Author: _icenuts
 Section: Tweaks
-Depends: org.thebigboss.photo2weibo(>=2.5),libactivator(>=1.6.2),com.icenuts.disablencswitch(>=1.0.2)
+Depends: org.thebigboss.photo2weibo(>=2.5), libactivator(>=1.6.2), com.icenuts.disablencswitch(>=1.0.2)
