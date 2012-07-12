@@ -6,6 +6,8 @@
 #import <tweet2weibo/TWTweetSheetLocationAssembly.h>
 #import <tweet2weibo/TWTweetComposeViewController-TWTweetComposeViewControllerMentionAdditions.h>
 #import <tweet2weibo/UIActionSheet-Private.h>
+#import <tweet2weibo/CGWindowLevel.h>
+#import "Constants.h"
 #import "photoPicker.h"
 
 BOOL pwflagGesture = NO;
@@ -20,6 +22,7 @@ id assembly;
 BOOL isAddPicture = NO;
 id normal_image;
 id glow_image;
+BOOL isHidden = NO;
 
 //IPC Declaration
 @interface CPDistributedMessagingCenter
@@ -93,7 +96,9 @@ BOOL isCancelTappedGesture = NO;
 			isAddPicture = [ppicker isAdded];
 		}
 		NSDictionary *dictionary;
-		NSData *my_data = UIImagePNGRepresentation([ppicker chose]);
+		
+		NSData *my_data = [NSData dataWithData: [ppicker rawData]];
+		
 		if(isAddPicture){
 			dictionary = [NSDictionary dictionaryWithObjectsAndKeys: [self enteredText], @"text", my_data, @"imgData", nil];
 		}else{
@@ -136,6 +141,10 @@ BOOL isCancelTappedGesture = NO;
 			picImageView = nil;
 			picImageViewGlow = nil;
 			assembly = nil;
+			if(isHidden){
+				isHidden = NO;
+				[[UIApplication sharedApplication] setStatusBarHidden:NO  withAnimation:UIStatusBarAnimationSlide];
+			}
 		}
 	}
 }
@@ -337,10 +346,31 @@ BOOL isCancelTappedGesture = NO;
 			ppicker.glow = glow_image;
 			[ppicker setParentViewController: sendViewGesture];
 			ppicker.isAdded = NO;
+			imagePicker.allowsEditing = YES;
 		}
 		ppicker.text = [sendViewGesture enteredText];
 		imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-		[sendViewGesture presentViewController: imagePicker animated: YES completion: NULL];
+		
+		//can't fix statusbar hidden error, too hard
+		NSString* filePath = @"/var/mobile/Library/DisableNCSwitch/disableNC.plist";
+		NSMutableDictionary *plistDict = [[NSMutableDictionary alloc] initWithContentsOfFile: filePath];
+		if([[plistDict objectForKey:@"inApp"] isEqualToString: @"YES"]){
+			isHidden = YES;
+			[[UIApplication sharedApplication] setStatusBarHidden:YES  withAnimation:UIStatusBarAnimationSlide];
+		}else{
+			isHidden = NO;
+		}
+		BOOL iPad = [[[UIDevice currentDevice] model] isEqualToString: @"iPad"];
+		if(iPad){
+			id popover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
+			[imagePicker release];
+			ppicker.popover = popover;
+			[popover presentPopoverFromRect:CGRectMake([picImageView center].x,[picImageView center].y, 800, 400) inView: [[wd rootViewController] view]
+			                permittedArrowDirections:UIPopoverArrowDirectionAny
+			                animated:YES];
+		}else{
+			[sendViewGesture presentViewController: imagePicker animated: YES completion: NULL];
+		}
 	}
 }
 %end
@@ -400,13 +430,13 @@ BOOL isCancelTappedGesture = NO;
 			pwflagGesture = YES;
 			wd = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 			wd.screen = [UIScreen mainScreen];
-			[wd setWindowLevel: UIWindowLevelNormal];
+			[wd setWindowLevel: kWindowLevelTransparentTopMost];
 			Class $TWTweetComposeViewController = objc_getClass("TWTweetComposeViewController");
 			sendViewGesture = [[$TWTweetComposeViewController alloc] init];
 			[wd setRootViewController: [[UIViewController alloc] init]];
 			[wd makeKeyAndVisible];			
-			normal_image = normal_image? normal_image : [[UIImage alloc] initWithContentsOfFile: @"var/mobile/Library/share2weibo/normal.png"];
-			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"var/mobile/Library/share2weibo/glow.png"];
+			normal_image = normal_image? normal_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/normal.png"];
+			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/glow.png"];
 			[[wd rootViewController] presentViewController: sendViewGesture animated: NO completion: NULL];
 		}else{
 			pwflagGesture = NO;

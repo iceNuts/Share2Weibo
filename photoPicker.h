@@ -9,6 +9,9 @@
 @property (nonatomic, retain) id glow;
 @property (nonatomic, retain) id chose;
 @property (nonatomic, retain) id text;
+@property (nonatomic, retain) id rawData;
+@property (nonatomic, retain) id popover;
+
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info;
 @end
