@@ -12,4 +12,8 @@ build/*
 !default.xcworkspace
 xcuserdata
 profile
-*.moved-aside
+*.moved-asid
+*.DS_Store
+*.theos/
+*_/
+obj/*
