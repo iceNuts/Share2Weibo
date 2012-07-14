@@ -59,8 +59,8 @@
 		}
 	}
 	
-	if(width > 650){
-		width = 650;
+	if(width > myscale){
+		width = myscale;
 		height = width*ratio;
 	}
 	CGSize newSize = CGSizeMake(width, height);
