@@ -1,4 +1,7 @@
 #import "photoPicker.h"
+#import "Reachability.h"
+
+#define PrefFilePath @"/var/mobile/Library/Preferences/com.icenuts.photosweibo.image.plist"
 
 @implementation photoPicker
 
@@ -21,6 +24,40 @@
 	CGFloat width = original.size.width;
 	CGFloat height = original.size.height;
 	CGFloat ratio = height/width;
+	
+	id Preferences = [[NSDictionary alloc] initWithContentsOfFile: PrefFilePath];
+	NSString* state;
+	int myscale = 600;
+	if([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == ReachableViaWiFi){
+		NSLog(@"-----Wifi-----");
+		myscale = 600;
+		state = [Preferences valueForKey:@"PhotoImageWifi"];
+		if([state isEqualToString: @"low"]){
+			myscale = 600;
+		}else if([state isEqualToString: @"medium"]){
+			myscale = 900;
+		}else if([state isEqualToString: @"high"]){
+			myscale = 1400;
+		}
+		if(width > myscale){
+			width = myscale;
+			height = width*ratio;
+		}
+	}else{
+		myscale = 450;
+		state = [Preferences valueForKey:@"PhotoImageCarrier"];
+		if([state isEqualToString: @"low"]){
+			myscale = 450;
+		}else if([state isEqualToString: @"medium"]){
+			myscale = 600;
+		}else if([state isEqualToString: @"high"]){
+			myscale = 900;
+		}
+		if(width > myscale){
+			width = myscale;
+			height = width*ratio;
+		}
+	}
 	
 	if(width > 650){
 		width = 650;
