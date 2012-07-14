@@ -358,7 +358,7 @@ BOOL isCancelTappedGesture = NO;
 			[imagePicker release];
 			ppicker.popover = popover;
 			[popover presentPopoverFromRect:CGRectMake([picImageView center].x,[picImageView center].y, 800, 400) inView: [[wd rootViewController] view]
-			                permittedArrowDirections:UIPopoverArrowDirectionAny
+			                permittedArrowDirections:UIPopoverArrowDirectionLeft
 			                animated:YES];
 		}else{
 			[sendViewGesture presentViewController: imagePicker animated: YES completion: NULL];
