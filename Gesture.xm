@@ -299,7 +299,10 @@ BOOL isCancelTappedGesture = NO;
 	}
 	return %orig;
 }
-- (BOOL)shouldAutorotateToInterfaceOrientation:(int)arg1{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)arg1{
+	if(pwflagGesture){
+		return [[wd rootViewController] shouldAutorotateToInterfaceOrientation: arg1];
+	}
 	return %orig;
 }
 %end
@@ -377,9 +380,21 @@ BOOL isCancelTappedGesture = NO;
 }
 %end
 
+
 //////////////////////////
 /////// Twitter UI////////
 //////////////////////////
+
+@interface myRootViewController: UIViewController{
+	
+}
+@end
+
+@implementation myRootViewController
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)arg1{
+	return YES;
+}
+@end
 
 @interface Gesture: NSObject<LAListener, UIAlertViewDelegate>{
 	
@@ -419,19 +434,19 @@ BOOL isCancelTappedGesture = NO;
 			pwflagGesture = YES;
 			wd = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 			wd.screen = [UIScreen mainScreen];
-			[wd setWindowLevel: kWindowLevelTransparentTopMost];
+			[wd setWindowLevel: UIWindowLevelStatusBar/*kWindowLevelTransparentTopMost*/];
 			Class $TWTweetComposeViewController = objc_getClass("TWTweetComposeViewController");
 			sendViewGesture = [[$TWTweetComposeViewController alloc] init];
-			[wd setRootViewController: [[UIViewController alloc] init]];
-			//For rotation
-			[wd _updateInterfaceOrientationFromDeviceOrientationIfRotationEnabled: YES];
-			[wd setAutorotates:YES forceUpdateInterfaceOrientation:YES];
-		
+			
+			//For Rotation
+			[wd resizesToFullScreen];
+			id root = [[[myRootViewController alloc] init] autorelease];
+			
+			[wd setRootViewController: root];			
 			[wd makeKeyAndVisible];			
 			normal_image = normal_image? normal_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/normal.png"];
 			glow_image = glow_image? glow_image : [[UIImage alloc] initWithContentsOfFile: @"/Library/Application Support/share2weibo/glow.png"];	
-			[sendViewGesture _updateLayoutForStatusBarAndInterfaceOrientation];	
-			
+									
 			[[wd rootViewController] presentViewController: sendViewGesture animated: NO completion: NULL];
 		}else{
 			pwflagGesture = NO;
