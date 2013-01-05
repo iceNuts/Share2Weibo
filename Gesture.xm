@@ -186,9 +186,9 @@ BOOL isCancelTappedGesture = NO;
 		}
 		var = class_getInstanceVariable([self class], "_locationAssembly");
 		assembly = object_getIvar(self, var);
-		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_locationButton");
+		var = class_getInstanceVariable([%c(TWTweetSheetLocationAssembly) self], "_locationButton");
 		picImageView = object_getIvar(assembly, var);
-		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_locationButtonGlow");
+		var = class_getInstanceVariable([%c(TWTweetSheetLocationAssembly) self], "_locationButtonGlow");
 		picImageViewGlow = object_getIvar(assembly, var);
 						
 		var = class_getInstanceVariable([self class], "_sendButton");
@@ -254,7 +254,7 @@ BOOL isCancelTappedGesture = NO;
 		NSDictionary *Result = [[NSDictionary alloc]init];	
 		Result = [sql getweibofriendHead: searchBarTextGesture];
 		
-		TWUserRecord *item1 = [TWUserRecord userRecordWithScreenName: searchBarTextGesture];
+		TWUserRecord *item1 = [%c(TWUserRecord) userRecordWithScreenName: searchBarTextGesture];
 		
 		[specs addObject: item1];
 		int number = [Result count];
@@ -277,7 +277,7 @@ BOOL isCancelTappedGesture = NO;
 			}else{
 				screenName = [object copy];
 			}
-			TWUserRecord *item = [TWUserRecord userRecordWithScreenName: screenName];
+			TWUserRecord *item = [%c(TWUserRecord) userRecordWithScreenName: screenName];
 			[item setName: alias];
 			[specs addObject: item];
 		}

@@ -138,7 +138,7 @@ BOOL isCancelTappedSafari = NO;
 		}
 		var = class_getInstanceVariable([self class], "_locationAssembly");
 		id assembly = object_getIvar(self, var);
-		var = class_getInstanceVariable([TWTweetSheetLocationAssembly self], "_assemblyView");
+		var = class_getInstanceVariable([%c(TWTweetSheetLocationAssembly) self], "_assemblyView");
 		id geo = object_getIvar(assembly, var);
 		[geo setHidden: YES];
 		var = class_getInstanceVariable([self class], "_sendButton");
@@ -209,7 +209,7 @@ BOOL isCancelTappedSafari = NO;
 		center = [CPDistributedMessagingCenter centerNamed:@"com.icenuts.photo2weibo.bannerserver"];
 		NSDictionary *Result = [center sendMessageAndReceiveReplyName:@"com.icenuts.photo2weibo.query" userInfo: [NSDictionary dictionaryWithObjectsAndKeys: searchBarTextSafari, @"msg",nil ]];
 		
-		TWUserRecord *item1 = [TWUserRecord userRecordWithScreenName: searchBarTextSafari];
+		TWUserRecord *item1 = [%c(TWUserRecord) userRecordWithScreenName: searchBarTextSafari];
 		
 		[specs addObject: item1];
 		int number = [Result count];
@@ -232,7 +232,7 @@ BOOL isCancelTappedSafari = NO;
 			}else{
 				screenName = [object copy];
 			}
-			TWUserRecord *item = [TWUserRecord userRecordWithScreenName: screenName];
+			TWUserRecord *item = [%c(TWUserRecord) userRecordWithScreenName: screenName];
 			[item setName: alias];
 			[specs addObject: item];
 		}
